@@ -16,4 +16,4 @@ There are several modes.
 
 The `demo/` directory includes the following files:
 * [`AntuinoTerm.py`](./demos/AntuinoTerm.py) - lifted mostly from [kholia/Antuino-V1](https://github.com/kholia/Antuino-V1/blob/AiO/src/AntuinoTerm.py), does the serial communications.  Could stand to be rewritten without a `while` loop, but does the job.
-* [`analyseAntuino.py`](./demos/analyseAntuino.py) - uses `AntuinoTerm.py` as a library, analyses various amateur bands, and writes to files.  (Will need to create `./logs` directory for now.)
+* [`analyseAntuino.py`](./demos/analyseAntuino.py) - uses `AntuinoTerm.py` as a library, analyses various amateur bands, and writes to files.  (Will need to create `./logs` directory or specify where to store logs with `--logdir`.)
