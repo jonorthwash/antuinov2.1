@@ -26,6 +26,11 @@ long spans[] = {
       5000l
 };
 
+unsigned long fromFrequency = 14150000;
+unsigned long toFrequency = 30000000;
+unsigned long sweepStepSize = 50000;  // 50 KHz, for sweeping
+unsigned char serial_in_count = 0;
+
 int selectedSpan = 0;
 #define MAX_SPANS 8
 
@@ -394,6 +399,128 @@ void setup() {
   updateMeter();
 }
 
+void readDetector(unsigned long f){
+  int i = openReading(f) - analogRead(DBM_READING)/5;
+  sprintf(c, "d%d\n", i);
+  Serial.write(c);
+}
+
+void doSweep(){
+  unsigned long x;
+  int reading, vswr_reading;
+
+  /* stepSize = (toFrequency - fromFrequency) / 3000;
+  if (stepSize <= 0) {
+    stepSize = 300;
+  } */
+  Serial.write("begin\n");
+  for (x = fromFrequency; x < toFrequency; x = x + sweepStepSize){
+    takeReading(x);
+    delay(10);
+    reading = openReading(x) - analogRead(DBM_READING)/5;
+    if (mode == MODE_ANTENNA_ANALYZER){
+      if (reading < 0)
+        reading = 0;
+      vswr_reading = pgm_read_word_near(vswr + reading);
+      sprintf (c, "r:%ld:%d:%d\n", x, reading, vswr_reading);
+    }else
+      sprintf(c, "r:%ld:%d\n", x, analogRead(DBM_READING)/5 + dbmOffset);
+    Serial.write(c);
+  }
+  Serial.write("end\n");
+}
+
+char *readNumber(char *p, unsigned long *number){
+  *number = 0;
+
+  sprintf(c, "#%s", p);
+  while (*p){
+    char c = *p;
+    if ('0' <= c && c <= '9')
+      *number = (*number * 10) + c - '0';
+    else
+      break;
+     p++;
+  }
+  return p;
+}
+
+char *skipWhitespace(char *p){
+  while (*p && (*p == ' ' || *p == ','))
+    p++;
+  return p;
+}
+
+/* command 'h' */
+void sendStatus(){
+  Serial.write("helo v1\n");
+  sprintf(c, "from %ld\n", fromFrequency);
+  Serial.write(c);
+
+  sprintf(c, "to %ld\n", toFrequency);
+  Serial.write(c);
+
+  sprintf(c, "mode %ld\n", mode);
+  Serial.write(c);
+
+}
+
+void parseCommand(char *line){
+  char *p = line;
+  char command;
+
+  while (*p){
+    p = skipWhitespace(p);
+    command = *p++;
+
+    switch (command){
+      case 'f' : //from - start frequency
+        p = readNumber(p, &fromFrequency);
+        takeReading(fromFrequency);
+        break;
+      case 'm':
+        p = readNumber(p, &mode);
+        updateDisplay();
+        break;
+      case 't':
+        p = readNumber(p, &toFrequency);
+        break;
+      case 'v':
+        sendStatus();
+        break;
+      case 'g':
+         doSweep();
+         break;
+      case 'r':
+         readDetector(frequency);
+         break;
+      case 's':
+        p = readNumber(p, &sweepStepSize);
+        break;
+      case 'i': /* identifies itself */
+        Serial.write("i Antuino 1.3\n");
+        break;
+    }
+  } /* end of the while loop */
+}
+
+void acceptCommand(){
+  int inbyte = 0;
+  inbyte = Serial.read();
+
+  if (inbyte == '\n'){
+    parseCommand(serial_in);
+    serial_in_count = 0;
+    return;
+  }
+
+  if (serial_in_count < sizeof(serial_in)){
+    serial_in[serial_in_count] = inbyte;
+    serial_in_count++;
+    serial_in[serial_in_count] = 0;
+  }
+}
+
 int prev = 0;
 void loop()
 {
@@ -402,13 +529,16 @@ void loop()
  // doTuning2();
 //  checkButton();
 
+  if (Serial.available()>0)
+    acceptCommand();
+
   int r = analogRead(DBM_READING);
 
   if (r != prev){
     takeReading(centerFreq);
     updateMeter();
     prev = r;
-    Serial.println(r);
+    //Serial.println(r);
   }
   delay(50);   
 }
