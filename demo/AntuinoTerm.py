@@ -18,47 +18,47 @@ import serial.tools.list_ports
 
 import numpy as np
 
-import wx
-import wx.lib.agw.aui as aui
-import wx.lib.mixins.inspection as wit
-
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
-from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
-
-
-class Plot(wx.Panel):
-    def __init__(self, parent, id=-1, dpi=None, **kwargs):
-        wx.Panel.__init__(self, parent, id=id, **kwargs)
-        self.figure = plt.figure(dpi=dpi, figsize=(32, 32))
-        self.canvas = FigureCanvas(self, -1, self.figure)
-        self.toolbar = NavigationToolbar(self.canvas)
-        self.toolbar.Realize()
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.canvas, 1, wx.EXPAND)
-        sizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-        self.SetSizer(sizer)
-
-        self.theplot = self.figure.add_subplot(111)
-        self.theplot.set_title("")
-        self.theplot.set_xlabel("Frequency (MHz)")
-        self.theplot.set_ylabel("SWR")
+#import wx
+#import wx.lib.agw.aui as aui
+#import wx.lib.mixins.inspection as wit
+#
+#import matplotlib.pyplot as plt
+#import matplotlib.ticker as ticker
+#from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
+#from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 
 
-class PlotNotebook(wx.Panel):
-    def __init__(self, parent, id=-1):
-        wx.Panel.__init__(self, parent, id=id)
-        self.nb = aui.AuiNotebook(self)
-        sizer = wx.BoxSizer()
-        sizer.Add(self.nb, 1, wx.EXPAND)
-        self.SetSizer(sizer)
+#class Plot(wx.Panel):
+#    def __init__(self, parent, id=-1, dpi=None, **kwargs):
+#        wx.Panel.__init__(self, parent, id=id, **kwargs)
+#        self.figure = plt.figure(dpi=dpi, figsize=(32, 32))
+#        self.canvas = FigureCanvas(self, -1, self.figure)
+#        self.toolbar = NavigationToolbar(self.canvas)
+#        self.toolbar.Realize()
+#
+#        sizer = wx.BoxSizer(wx.VERTICAL)
+#        sizer.Add(self.canvas, 1, wx.EXPAND)
+#        sizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
+#        self.SetSizer(sizer)
+#
+#        self.theplot = self.figure.add_subplot(111)
+#        self.theplot.set_title("")
+#        self.theplot.set_xlabel("Frequency (MHz)")
+#        self.theplot.set_ylabel("SWR")
 
-    def add(self, name="plot"):
-        page = Plot(self.nb)
-        self.nb.AddPage(page, name)
-        return page.figure
+
+#class PlotNotebook(wx.Panel):
+#    def __init__(self, parent, id=-1):
+#        wx.Panel.__init__(self, parent, id=id)
+#        self.nb = aui.AuiNotebook(self)
+#        sizer = wx.BoxSizer()
+#        sizer.Add(self.nb, 1, wx.EXPAND)
+#        self.SetSizer(sizer)
+#
+#    def add(self, name="plot"):
+#        page = Plot(self.nb)
+#        self.nb.AddPage(page, name)
+#        return page.figure
 
 
 template = """frequencies = %s
