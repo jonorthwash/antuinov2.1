@@ -414,7 +414,7 @@ void doSweep(){
     stepSize = 300;
   } */
   Serial.write("begin\n");
-  for (x = fromFrequency; x < toFrequency; x = x + sweepStepSize){
+  for (x = fromFrequency; x <= toFrequency; x = x + sweepStepSize){
     takeReading(x);
     delay(10);
     reading = openReading(x) - analogRead(DBM_READING)/5;
