@@ -38,7 +38,7 @@ def make_plot(infile, title, subtitle, outfile):
 
         fig, ax = plt.subplots(figsize=figsize)
 
-        ax.plot(x, y, c='r', edgecolor='r', linewidth=5.0)
+        ax.plot(x, y, lw=5, color='red')
     
         plt.yscale('symlog')
         plt.ylim(1, 6)
@@ -55,12 +55,13 @@ def make_plot(infile, title, subtitle, outfile):
         plt.ylabel('SWR')
         plt.suptitle(title, fontsize=24, x=0.53)#, y=1)
         plt.title(subtitle, color='grey')
+        plt.tick_params(axis='both', labelsize=18)
         #plt.show()
         #plt.margins(0.015, tight=True)
         #plt.tight_layout()
         margins = {  #     vvv margin in inches
-            "left"   :     0.6 / figsize[0],
-            "bottom" :     0.5 / figsize[1],
+            "left"   :     0.7 / figsize[0],
+            "bottom" :     0.6 / figsize[1],
             "right"  : 1 - 0.2 / figsize[0],
             "top"    : 1 - 0.7 / figsize[1]
         }
@@ -122,5 +123,6 @@ if __name__ == "__main__":
     if args.graph:
         import csv
         import matplotlib.pyplot as plt
+        #import matplotlib.patheffects as pe
         import re
         make_plots(args.logdir)
